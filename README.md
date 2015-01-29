@@ -38,3 +38,4 @@ TODO
 - Commands (probably maybe not)
 - Colouring (probably maybe not)
 - Tidying up code (IDK)
+- ***SCROLLING***
