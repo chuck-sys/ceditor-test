@@ -31,10 +31,10 @@ int main(int argc, char* argv[])
     {
         if(ed.upstatus)
             ed.updateStatus();
+        ed.printStatusLine();
         ed.printBuff();
         int input = getch();
         ed.handleInput(input);
-        ed.printStatusLine();
     }
 
     refresh();

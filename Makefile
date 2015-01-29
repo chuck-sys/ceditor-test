@@ -15,18 +15,18 @@ EXE := ceditor
 all: $(EXE)
 
 clean:
-    rm -f $(OBJ)
-    rm -f $(EXE)
+	rm -f $(OBJ)
+	rm -f $(EXE)
 
 $(EXE): $(OBJDIR) $(OBJ)
-    $(LD) $(OBJ) $(LDFLAGS) -o $@
+	$(LD) $(OBJ) $(LDFLAGS) -o $@
 
 $(OBJDIR):
-    mkdir $@
+	mkdir $@
 
 $(OBJDIR)/%.o: $(SRCDIR)/%.cpp
-    $(CXX) $(CXXFLAGS) $< -o $@
+	$(CXX) $(CXXFLAGS) $< -o $@
 
 $(OBJDIR)/%.o: $(SRCDIR)/%.cpp $(SRCDIR)/%.h
-    $(CXX) $(CXXFLAGS) $< -o $@
+	$(CXX) $(CXXFLAGS) $< -o $@
 

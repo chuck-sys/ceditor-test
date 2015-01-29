@@ -59,7 +59,7 @@ void Editor::updateStatus()
             status = "Exiting";
             break;
     }
-    status += "\tX: " + to_string(x) + "\tY: " + to_string(y);
+    status += "\tCOL: " + to_string(x) + "\tROW: " + to_string(lowerbound+y);
 }
 
 void Editor::handleInput(int c)
@@ -211,21 +211,29 @@ void Editor::moveUp()
     if(y-1 >= 0)
     {
         y--;
-        move(y, x);
+    }
+    else if(y-1 < 0 && lowerbound > 0)
+    {
+        lowerbound--;
     }
     if(x >= buff->lines[y].length())
         x = buff->lines[y].length();
+    move(y, x);
 }
 
 void Editor::moveDown()
 {
-    if(y+1 < LINES && y+1 < buff->lines.size())
+    if(y+1 < LINES-1 && y+1 < buff->lines.size())
     {
         y++;
-        move(y, x);
+    }
+    else if(lowerbound+y < buff->lines.size())
+    {
+        lowerbound++;
     }
     if(x >= buff->lines[y].length())
         x = buff->lines[y].length();
+    move(y, x);
 }
 
 void Editor::printBuff()
