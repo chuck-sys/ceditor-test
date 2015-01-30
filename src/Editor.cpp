@@ -51,7 +51,7 @@ void Editor::updateStatus()
     switch(mode)
     {
         case 'n':
-            status = "Normal Mode";
+            status = string(CED_TITLE) + " " + string(CED_VERSION);
             break;
         case 'i':
             status = "Insert Mode";

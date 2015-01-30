@@ -5,6 +5,9 @@
 
 #include <ncurses.h>
 
+#define CED_TITLE "ceditor"
+#define CED_VERSION "v0.1.0 test"
+
 class Editor
 {
     private:
