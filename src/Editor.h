@@ -16,6 +16,8 @@ class Editor
         string cmd;
         string filename;
 
+        string tos(int);
+
         void moveUp();
         void moveDown();
         void moveLeft();

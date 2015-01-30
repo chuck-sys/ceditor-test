@@ -1,5 +1,5 @@
 CXX := g++
-CXXFLAGS := -c -std=c++11
+CXXFLAGS := -c
 LD := g++
 LDFLAGS := -lncurses
 

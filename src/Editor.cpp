@@ -2,6 +2,7 @@
 
 #include <fstream>
 #include <iostream>
+#include <sstream>
 
 Editor::Editor(string fn)
 {
@@ -59,7 +60,7 @@ void Editor::updateStatus()
             status = "Exiting";
             break;
     }
-    status += "\tCOL: " + to_string(x) + "\tROW: " + to_string(lowerbound+y);
+    status += "\tCOL: " + tos(x) + "\tROW: " + tos(lowerbound+y);
 }
 
 void Editor::handleInput(int c)
@@ -249,7 +250,7 @@ void Editor::printBuff()
         {
             mvprintw(lc, 0, buff->lines[i].c_str());
         }
-        //printw(to_string(i).c_str());
+        //printw(tos(i).c_str());
         clrtoeol();
         lc++;
     }
@@ -273,7 +274,7 @@ void Editor::saveFile()
         filename = "untitled";
     }
 
-    ofstream f(filename);
+    ofstream f(filename.c_str());
     if(f.is_open())
     {
         for(int i=0; i<buff->lines.size(); i++)
@@ -287,4 +288,11 @@ void Editor::saveFile()
         status = "Error: Cannot open file for writing!";
     }
     f.close();
+}
+
+string Editor::tos(int n)
+{
+    stringstream ss;
+    ss << n;
+    return ss.str();
 }
