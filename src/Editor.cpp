@@ -200,7 +200,7 @@ void Editor::moveLeft()
 
 void Editor::moveRight()
 {
-    if(x+1 < COLS && x+1 < buff->lines[y].length())
+    if(x+1 < COLS && x+1 <= buff->lines[y].length())
     {
         x++;
         move(y, x);
