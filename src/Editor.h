@@ -14,12 +14,15 @@ class Editor
         int x, y;
         int lowerbound;
         char mode;
+        bool raiseflag;
         Buffer* buff;
         string status;
         string cmd;
         string filename;
 
         string tos(int);
+
+        bool execCmd();
 
         void moveUp();
         void moveDown();

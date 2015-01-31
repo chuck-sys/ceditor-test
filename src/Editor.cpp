@@ -9,6 +9,7 @@ Editor::Editor(string fn)
     x = 0; y = 0; mode = 'n';
     cmd = "";
     lowerbound = 0;
+    raiseflag = false;                  // for debugging
     upstatus = true;
     status = "Normal Mode";
     buff = new Buffer();
@@ -39,6 +40,7 @@ Editor::Editor()
     x = 0; y = 0; mode = 'n';
     cmd = "";
     upstatus = true;
+    raiseflag = false;
     status = "Normal Mode";
     lowerbound = 0;
     filename = "";
@@ -51,7 +53,10 @@ void Editor::updateStatus()
     switch(mode)
     {
         case 'n':
-            status = string(CED_TITLE) + " " + string(CED_VERSION);
+            if(cmd.empty())
+                status = string(CED_TITLE) + " " + string(CED_VERSION);
+            else
+                status = cmd;
             break;
         case 'i':
             status = "Insert Mode";
@@ -60,7 +65,7 @@ void Editor::updateStatus()
             status = "Exiting";
             break;
     }
-    status += "\tCOL: " + tos(x) + "\tROW: " + tos(lowerbound+y);
+    status += "\tCOL: " + tos(x) + "\tROW: " + tos(lowerbound);
 }
 
 void Editor::handleInput(int c)
@@ -71,16 +76,6 @@ void Editor::handleInput(int c)
         case 'n':
             switch(c)
             {
-                case 'i':
-                    mode = 'i';
-                    break;
-                case 'x':
-                    mode = 'x';
-                    break;
-                case 's':
-                    upstatus = false;
-                    saveFile();
-                    break;
                 case KEY_LEFT:
                     moveLeft();
                     break;
@@ -92,6 +87,27 @@ void Editor::handleInput(int c)
                     break;
                 case KEY_DOWN:
                     moveDown();
+                    break;
+                case KEY_ENTER:
+                case 10:
+                    // Execute the command
+                    execCmd();
+                    break;
+                case 27:
+                    // Escape/Alt key
+                    // clears command
+                    cmd.clear();
+                    break;
+                case 127:
+                case KEY_BACKSPACE:
+                case KEY_DC:
+                    // Removes last character
+                    if(!cmd.empty())
+                        cmd.erase(cmd.length()-1, 1);
+                    break;
+                default:
+                    // Add character to command
+                    cmd += string(1, char(c));
                     break;
             }
             break;
@@ -148,16 +164,15 @@ void Editor::handleInput(int c)
                 case KEY_ENTER:
                 case 10:
                     // Bring rest of line down
-                    if(x < buff->lines[y].length()-1)
+                    if(x < buff->lines[y+lowerbound].length()-1)
                     {
                         // Put rest of line on new line
-                        buff->insertLine(buff->lines[y].substr(x, buff->lines[y].length()-x), y+1);
+                        buff->insertLine(buff->lines[y+lowerbound].substr(x, buff->lines[y+lowerbound].length()-x), y+1);
                         // Remove that part of the line
-                        buff->lines[y].erase(x, buff->lines[y].length()-x);
+                        buff->lines[y+lowerbound].erase(x, buff->lines[y+lowerbound].length()-x);
                     }
                     else
-                        buff->insertLine("", y+1);
-                    x--;
+                        buff->insertLine("", y+lowerbound+1);
                     moveDown();
                     break;
                 case KEY_BTAB:
@@ -166,11 +181,11 @@ void Editor::handleInput(int c)
                 case KEY_CATAB:
                 case 9:
                     // The tab
-                    buff->lines[y].insert(x, 4, ' ');
+                    buff->lines[y+lowerbound].insert(x, 4, ' ');
                     x+=4;
                     break;
                 default:
-                    buff->lines[y].insert(x, 1, char(c));
+                    buff->lines[y+lowerbound].insert(x, 1, char(c));
                     x++;
                     break;
             }
@@ -230,6 +245,7 @@ void Editor::moveDown()
     }
     else if(lowerbound+y < buff->lines.size())
     {
+        raiseflag = true;
         lowerbound++;
     }
     if(x >= buff->lines[y].length())
@@ -239,18 +255,16 @@ void Editor::moveDown()
 
 void Editor::printBuff()
 {
-    int lc = 0;
+    int lc = 0;                     // Line count
     for(int i=lowerbound; lc<LINES-1; i++)
     {
         if(i >= buff->lines.size())
         {
-            move(lc, 0);
         }
         else
         {
             mvprintw(lc, 0, buff->lines[i].c_str());
         }
-        //printw(tos(i).c_str());
         clrtoeol();
         lc++;
     }
@@ -259,11 +273,14 @@ void Editor::printBuff()
 
 void Editor::printStatusLine()
 {
-    attron(A_BOLD | A_REVERSE);
+    if(raiseflag)
+        attron(A_BOLD);
+    attron(A_REVERSE);
     mvprintw(LINES-1, 0, status.c_str());
     clrtoeol();
-    attroff(A_BOLD | A_REVERSE);
-    move(y, x);
+    if(raiseflag)
+        attroff(A_BOLD);
+    attroff(A_REVERSE);
 }
 
 void Editor::saveFile()
@@ -295,4 +312,20 @@ string Editor::tos(int n)
     stringstream ss;
     ss << n;
     return ss.str();
+}
+
+bool Editor::execCmd()
+{
+    if(cmd == "i")
+        mode = 'i';
+    else if(cmd == "x")
+        mode = 'x';
+    else if(cmd == "s")
+    {
+        upstatus = false;
+        saveFile();
+    }
+
+    cmd = "";                       // Reset command buffer
+    return true;                    // Returns if command has executed successfully
 }
