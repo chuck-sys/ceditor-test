@@ -10,7 +10,7 @@ string Buffer::remTabs(string line)
     if(tab == line.npos)
         return line;
     else
-        return line.replace(tab, 1, "    ");
+        return remTabs(line.replace(tab, 1, "    "));
 }
 
 void Buffer::insertLine(string line, int x)
